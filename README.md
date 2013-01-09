@@ -22,7 +22,7 @@ opened.
 
 ## Requirements
 
-To use indentfinder, vim must be compiled with |+python| enabled.
+To use indentfinder, vim must be compiled with *+python* enabled.
 
 ## Installation
 
@@ -43,9 +43,9 @@ settings.
 
 ## About
 
-This document was written by Timothy Lin <lzh9102@gmail.com>.
+This document was written by Timothy Lin (lzh9102@gmail.com).
 
-Indent Finder was written by Philippe Fremy <phil@freehackers.org>.
+Indent Finder was written by Philippe Fremy (phil@freehackers.org).
 
 Copyright 2002 Philippe Fremy, All rights reserved.
 
