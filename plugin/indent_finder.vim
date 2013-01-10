@@ -14,6 +14,7 @@ python << EOS
 
 import sys
 import re
+import vim
 
 help = \
 """Usage : %s [ --vim-output ] [ --verbose ] file1 file2 ... fileN
@@ -472,7 +473,6 @@ def main():
             print str(fi)
 
 def FindIndent(verbose=False):
-    import vim
     fi = IndentFinder()
     fi.parse_buffer(vim.current.buffer)
     output = fi.vim_output()
