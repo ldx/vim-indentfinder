@@ -478,7 +478,7 @@ def FindIndent(verbose=False):
     output = fi.vim_output()
     if output:
         vim.command(output)
-        msg = str(fi)
+        msg = "tab settings: %s" % str(fi)
     else:
         msg = "not enough information to determine indent settings"
     if verbose:
