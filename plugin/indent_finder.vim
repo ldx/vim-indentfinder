@@ -36,18 +36,6 @@ set sts=0 | set tabstop=4 | set noexpandtab | set shiftwidth=4
 
 VERSION='1.4'
 
-### Used when indentation is tab, to set tabstop in vim
-DEFAULT_TAB_WIDTH = 4
-
-### default values for files where indentation is not meaningful (empty files)
-# possible values:
-# DEFAULT_RESULT = ('space', 4 )
-# DEFAULT_RESULT = ('space', 2 )
-# DEFAULT_RESULT = ('space', 8 )
-# DEFAULT_RESULT = ('tab', DEFAULT_TAB_WIDTH )
-
-DEFAULT_RESULT = ('space', 4 )
-
 VERBOSE_QUIET   = 0
 VERBOSE_INFO    = 1
 VERBOSE_DEBUG   = 2
@@ -115,15 +103,16 @@ class IndentFinder:
     At the end, the number of lines with space indentation, mixed space and tab indentation
     are compared and a decision is made.
 
-    If no decision can be made, DEFAULT_RESULT is returned.
+    If no decision can be made, the original indentation settings will be preserved
 
     If IndentFinder ever reports wrong indentation, send me immediately a
     mail, if possible with the offending file.
     """
 
-    def __init__(self, default_result=DEFAULT_RESULT):
+    def __init__(self):
         self.clear()
-        self.default_result = default_result
+        self.default_tabstop = int(vim.eval('&tabstop'))
+        self.default_result = ('default', 0)
 
     VERBOSITY = DEFAULT_VERBOSITY
 
@@ -380,7 +369,7 @@ class IndentFinder:
 
         # Detect tab files
         elif max_line_tab > max_line_mixed and max_line_tab > max_line_space:
-            result = ('tab', DEFAULT_TAB_WIDTH )
+            result = ('tab', self.default_tabstop )
 
         # Detect mixed files
         elif max_line_mixed >= max_line_tab and max_line_mixed > max_line_space:
@@ -429,7 +418,7 @@ class IndentFinder:
             #   => set tabstop to preferred value
             #   => set expandtab to false
             #   => set shiftwidth to tabstop
-            return "set sts=0 | set tabstop=%d | set noexpandtab | set shiftwidth=%d \" (%s)" % (DEFAULT_TAB_WIDTH, DEFAULT_TAB_WIDTH, indent_type )
+            return "set sts=0 | set tabstop=%d | set noexpandtab | set shiftwidth=%d \" (%s)" % (self.default_tabstop, self.default_tabstop, indent_type )
 
         if indent_type == 'mixed':
             tab_indent, space_indent = n
@@ -439,6 +428,9 @@ class IndentFinder:
             #   => set expandtab to false
             #   => set shiftwidth to space_indent
             return "set sts=4 | set tabstop=%d | set noexpandtab | set shiftwidth=%d \" (%s %d)" % (tab_indent, space_indent, indent_type, space_indent )
+        if indent_type == 'default':
+            # the default settings should be preserved
+            return None
 
 
 
@@ -479,17 +471,27 @@ def main():
         else:
             print str(fi)
 
+def FindIndent(verbose=False):
+    import vim
+    fi = IndentFinder()
+    fi.parse_buffer(vim.current.buffer)
+    output = fi.vim_output()
+    if output:
+        vim.command(output)
+        msg = str(fi)
+    else:
+        msg = "not enough information to determine indent settings"
+    if verbose:
+        vim.command("echomsg '%s'" % (msg))
 
 if __name__ == "__main__":
     main()
 EOS
 
-augroup indent
-    au!
-    au BufRead *.* :py import vim
-    au BufRead *.* :py fi = IndentFinder()
-    au BufRead *.* :py fi.parse_buffer(vim.current.buffer)
-    "au BufRead *.* :py print fi.vim_output()
-    au BufRead *.* :py vim.command(fi.vim_output())
-augroup END
+function! FindIndent()
+    python FindIndent(verbose=True)
+endfunction
 
+command FindIndent call FindIndent()
+
+au BufReadPost * :python FindIndent()
