@@ -484,8 +484,6 @@ def FindIndent(verbose=False):
     if verbose:
         vim.command("echomsg '%s'" % (msg))
 
-if __name__ == "__main__":
-    main()
 EOS
 
 function! FindIndent()
