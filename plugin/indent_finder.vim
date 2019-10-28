@@ -1,9 +1,9 @@
-if exists('indent_finder') || !has('python')
+if exists('indent_finder') || !has('python3')
     finish
 endif
 let indent_finder=1
 
-python << EOS
+python3 << EOS
 #
 # Indentation finder, by Philippe Fremy <phil at freehackers dot org>
 # Copyright 2002-2008 Philippe Fremy
@@ -58,7 +58,7 @@ def deepdbg( s ): log( VERBOSE_DEEP_DEBUG, s )
 
 def log( level, s ):
     if level <= IndentFinder.VERBOSITY:
-        print s
+        print(s)
 
 class IndentFinder:
     """
@@ -445,10 +445,10 @@ def main():
         elif opt == "--verbose" or opt == '-v':
             IndentFinder.VERBOSITY += 1
         elif opt == "--version":
-            print 'IndentFinder v%s' % VERSION
+            print('IndentFinder v%s' % VERSION)
             return
         elif opt[0] == "-":
-            print help % sys.argv[0]
+            print(help % sys.argv[0])
             return
         else:
             file_list.append( opt )
@@ -462,15 +462,15 @@ def main():
 
         if not one_file:
             if VIM_OUTPUT:
-                print "%s : %s" % (fname, fi.vim_output())
+                print( "%s : %s" % (fname, fi.vim_output()))
             else:
-                print "%s : %s" % (fname, str(fi))
+                print("%s : %s" % (fname, str(fi)))
 
     if one_file:
         if VIM_OUTPUT:
             sys.stdout.write( fi.vim_output() )
         else:
-            print str(fi)
+            print(str(fi))
 
 def FindIndent(verbose=False):
     fi = IndentFinder()
@@ -487,9 +487,9 @@ def FindIndent(verbose=False):
 EOS
 
 function! FindIndent()
-    python FindIndent(verbose=True)
+    python3 FindIndent(verbose=True)
 endfunction
 
 command FindIndent call FindIndent()
 
-au BufReadPost * :python FindIndent()
+au BufReadPost * :python3 FindIndent()
